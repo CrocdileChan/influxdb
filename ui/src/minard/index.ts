@@ -17,6 +17,8 @@ export {
   TooltipProps as HistogramTooltipProps,
 } from 'src/minard/components/Histogram'
 
+export {Heatmap} from 'src/minard/components/Heatmap'
+
 export interface Scale<D = number, R = number> {
   (x: D): R
   invert?: (y: R) => D
@@ -24,7 +26,7 @@ export interface Scale<D = number, R = number> {
 
 export interface AestheticDataMappings {
   x?: string
-  fill?: string[]
+  fill?: string[] | string
   xMin?: string
   xMax?: string
   yMin?: string
