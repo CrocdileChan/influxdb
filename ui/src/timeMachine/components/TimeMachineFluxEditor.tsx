@@ -5,7 +5,9 @@ import {connect} from 'react-redux'
 // Components
 import FluxEditor from 'src/shared/components/FluxEditor'
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
-import FluxFunctionsToolbar from 'src/timeMachine/components/flux_functions_toolbar/FluxFunctionsToolbar'
+import FluxFunctionsToolbar from 'src/timeMachine/components/fluxFunctionsToolbar/FluxFunctionsToolbar'
+import VariablesToolbar from 'src/timeMachine/components/variableToolbar/VariableToolbar'
+import ToolbarTab from 'src/timeMachine/components/ToolbarTab'
 
 // Actions
 import {setActiveQueryText, submitScript} from 'src/timeMachine/actions'
@@ -20,6 +22,7 @@ import {HANDLE_VERTICAL, HANDLE_NONE} from 'src/shared/constants'
 import {AppState} from 'src/types/v2'
 
 import 'src/timeMachine/components/TimeMachineFluxEditor.scss'
+import 'src/timeMachine/components/ToolbarTab.scss'
 
 interface StateProps {
   activeQueryText: string
@@ -30,9 +33,21 @@ interface DispatchProps {
   onSubmitScript: typeof submitScript
 }
 
+interface State {
+  displayFluxFunctions: boolean
+}
+
 type Props = StateProps & DispatchProps
 
-class TimeMachineFluxEditor extends PureComponent<Props> {
+class TimeMachineFluxEditor extends PureComponent<Props, State> {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      displayFluxFunctions: false,
+    }
+  }
+
   public render() {
     const {activeQueryText, onSetActiveQueryText, onSubmitScript} = this.props
 
@@ -51,7 +66,7 @@ class TimeMachineFluxEditor extends PureComponent<Props> {
         ),
       },
       {
-        render: () => <FluxFunctionsToolbar />,
+        render: () => this.rightDivision,
         handlePixels: 6,
         size: 0.25,
       },
@@ -62,6 +77,56 @@ class TimeMachineFluxEditor extends PureComponent<Props> {
         <Threesizer orientation={HANDLE_VERTICAL} divisions={divisions} />
       </div>
     )
+  }
+
+  private get rightDivision(): JSX.Element {
+    const {displayFluxFunctions} = this.state
+
+    if (displayFluxFunctions) {
+      return (
+        <>
+          <div className="toolbar-tabs">
+            <ToolbarTab
+              onSetActive={this.hideFluxFunctions}
+              name={'Variables'}
+              active={!displayFluxFunctions}
+            />
+            <ToolbarTab
+              onSetActive={this.showFluxFunctions}
+              name={'Functions'}
+              active={displayFluxFunctions}
+            />
+          </div>
+          <FluxFunctionsToolbar />
+        </>
+      )
+    }
+
+    return (
+      <>
+        <div className="toolbar-tabs">
+          <ToolbarTab
+            onSetActive={this.hideFluxFunctions}
+            name={'Variables'}
+            active={!displayFluxFunctions}
+          />
+          <ToolbarTab
+            onSetActive={this.showFluxFunctions}
+            name={'Functions'}
+            active={displayFluxFunctions}
+          />
+        </div>
+        <VariablesToolbar />
+      </>
+    )
+  }
+
+  private showFluxFunctions = () => {
+    this.setState({displayFluxFunctions: true})
+  }
+
+  private hideFluxFunctions = () => {
+    this.setState({displayFluxFunctions: false})
   }
 }
 
